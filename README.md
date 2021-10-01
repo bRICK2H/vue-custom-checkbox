@@ -1,21 +1,28 @@
 # izi-checkbox-component
 
 ## Config:
-| Name 				| Type 					| Default 			| Description 							|
-| ---- 				| :--: 					| :-----: 			| --------------- 					|
-| value 				| `Boolean`				| **false** 		| Переключающееся значение			|
-| label 				| `String`				| **''** 			| Заголовок для значения			|
-| labelPosition 	| `String`				| **'right'** 		| Позиция заголовка right|left	|
-| width 				| `[String, Number]`	| **24** 			| Ширина переключателя				|
-| height 			| `[String, Number]`	| **24** 			| Высота переключателя				|
-| margin 			| `[String, Number]`	| **'0 0 25 8'** 	| Внешнее смещение					|
-| classes 			| `Array`				| **[]** 			| Массив классов						|
+| Name 				  | Type 					      | Default 			  | Description
+| ---- 				  | :--: 					      | :-----: 			  | ---------------
+| v-model 		  | `Boolean`				    | **false** 		  | Переключающееся значение
+| label 				| `[String, Array]`   | **''** 			    | Заголовок для значения (если необходима череда ссылок и текста можно сформировать массив объектов text, link. Если link пуст вернется текст либо вернется ссылка)
+| labelPosition | `String`				    | **'right'** 		| Позиция заголовка right|left
+| disabled 			| `Boolean`	          | **false** 			| Заблокировать переключатель
+| viewType 			| `String`	          | **'square'** 		| Выбрать тип переключателя из ['square', 'rectangle']
+| width 				| `[String, Number]`	| **24** 			    | Ширина переключателя
+| height 			  | `[String, Number]`	| **24** 			    | Высота переключателя
+| margin 			  | `[String, Number]`	| **'0 0 25 8'** 	| Внешнее смещение
+| classes 			| `Array`				      | **[]** 			    | Массив классов
 
 ## Example:
 ```html
 <VCheckBox
   v-model="toggle"
-  label="Запомнить"
+  :label="[
+    { text: 'Я согласен с' },
+    { text: 'Публичной офертой', link: '/oferta' },
+    { text: 'и' },
+    { text: 'Политикой конфиденцальности', link: '/polit' },
+  ]"
   labelPosition="left"
   width="20"
   height="20"
@@ -32,6 +39,6 @@
   <img :src="auth.rememberme
   	? `${require('./assets/img/yes.png')}`
 	  : `${require('./assets/img/no.png')}`" alt="toggle"
-	.>
+	>
 </VCheckBox>
 ```
