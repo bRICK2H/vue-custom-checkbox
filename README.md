@@ -1,4 +1,4 @@
-# izi-checkbox-component
+# checkbox
 
 ## Config:
 | Name 				  | Type 					      | Default 			  | Description
