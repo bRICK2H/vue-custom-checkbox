@@ -1,51 +1,66 @@
 <template>
-	<div class="v-checkbox-container"
-		:class="classes"
-		:style="[setStyleHeight, setStyleContainerMargin]"
+	<div class="v-checkbox-wrapper"
+		:style="setStyleWrapper"
 	>
-		<!-- Native checkbox -->
-		<input type="checkbox"
-			class="v-checkbox-hidden v-checkbox-container__v-checkbox-hidden jcf-ignore"
-			:style="setStyleHeight"
-			:checked="value"
-			:disabled="disabled"
-			@change="$emit('input', !value)"
-			@keypress.enter="$emit('input', !value)"
+		<div class="v-checkbox-container"
+			:class="classes"
+			:style="[
+				setStyleHeight,
+				setStyleContainerPosition,
+				{ '--b-color': bColor }
+			]"
 		>
-		
-		<!-- Custom checkbox -->
-		<div class="v-checkbox"
-			:class="[setClassViewTypeCheckBox, setClassViewDetailCheckBox, setClassDisabledCheckBox]"
-			:style="setStyleDimensionsCheckBox"
-		>
-			<slot>
-				<div class="v-checkbox-image"
-					:class="setClassViewTypeImage"
-				></div>
-			</slot>
-		</div>
-
-		<!-- Label -->
-		<span class="v-checkbox-label v-checkbox-container__v-checkbox-label"
-				:class="[setClassLabelPosition, setClassContainsLabel]"
+			<!-- Native checkbox -->
+			<input type="checkbox"
+				class="v-checkbox-hidden v-checkbox-container__v-checkbox-hidden jcf-ignore"
+				:style="setStyleHeight"
+				:checked="value"
+				:disabled="disabled"
+				@change="$emit('input', !value)"
+				@keypress.enter="$emit('input', !value)"
 			>
-			<template v-if="Array.isArray(label) && label.length">
-				<template v-for="(el, i) of label">
-					<a v-if="'link' in el && el.link"
-						class="v-checkbox-target"
-						:href="el.link"
-					>
-						{{ el.text }}
-					</a>
-					<template v-else>
-						{{ el.text }}
+			
+			<!-- Custom checkbox -->
+			<div class="v-checkbox"
+				:class="[
+					elClass,
+					setClassViewTypeCheckBox,
+					setClassViewDetailCheckBox,
+					setClassDisabledCheckBox,
+				]"
+				:style="setStyleRectangleWidth"
+			>
+				<slot>
+					<div class="v-checkbox-image"
+						:class="setClassViewTypeImage"
+						:style="[{ '--r-size': `${height}px` }, setStyleSizeInnerChecked]"
+					></div>
+				</slot>
+			</div>
+	
+			<!-- Label -->
+			<span class="v-checkbox-label v-checkbox-container__v-checkbox-label"
+					:class="[setClassLabelPosition, setClassContainsLabel]"
+					:ref="labelRef"
+				>
+				<template v-if="Array.isArray(label) && label.length">
+					<template v-for="(el, i) of label">
+						<a v-if="'link' in el && el.link"
+							class="v-checkbox-target"
+							:href="el.link"
+						>
+							{{ el.text }}
+						</a>
+						<template v-else>
+							<span v-html="el.text"></span>
+						</template>
 					</template>
 				</template>
-			</template>
-			<template v-else>
-					{{ label }}
-			</template>
-		</span>
+				<template v-else>
+					<span v-html="label"></span>
+				</template>
+			</span>
+	</div>
 
 	</div>
 </template>
@@ -66,13 +81,17 @@ export default {
 			type: String,
 			default: 'right'
 		},
+		checkPosition: {
+			type: String,
+			default: 'center'
+		},
 		disabled: {
 			type: Boolean,
 			default: false
 		},
 		viewType: {
 			type: String,
-			default: 'square'
+			default: 'circle'
 		},
 		width: {
 			type: [String, Number],
@@ -84,46 +103,75 @@ export default {
 		},
 		margin: {
 			type: [String, Number],
-			default: '0 0 25 8'
+			default: '0 0 0 0'
+		},
+		elClass: {
+			type: String,
+			default: ''
 		},
 		classes: {
 			type: Array,
 			default: () => ([])
+		},
+		bColor: {
+			type: String,
+			default: '#1f1f33'
 		}
 	},
 	data: () => ({
 		specificWidth: {
 			square: 24,
+			circle: 24,
 			rectangle: 52
 		},
 		specificHeight: {
 			square: 24,
+			circle: 24,
 			rectangle: 32
 		},
+		labelRef: null,
+		labelHeight: 0,
 	}),
 	computed: {
 		setStyleHeight() {
 			return { height: `${+this.height}px` }
 		},
-		setStyleContainerMargin() {
+		setStyleWrapper() {
 			return {
-				margin: String(this.margin).split(' ').map(p => `${p}px`).join(' ')
+				height: +this.height < this.labelHeight
+					? `${this.labelHeight}px`
+					: `${this.height}px`,
+				margin: String(this.margin).split(' ').map(p => `${p}px`).join(' '),
 			}
 		},
-		setStyleDimensionsCheckBox() {
+		setStyleContainerPosition() {
+			const checkMap = {
+				top: 'flex-start',
+				start: 'flex-start',
+				center: 'center',
+				bottom: 'flex-end',
+				end: 'flex-end'
+			}
+
+			return {
+				alignItems: checkMap[this.checkPosition] ?? 'center'
+			}
+		},
+		setStyleSizeInnerChecked() {
+			return {
+				width: `${this.height}px`,
+				height: `${this.height}px`
+			}
+		},
+		setStyleRectangleWidth() {
 			const width = 'width' in this.$options.propsData
 				? this.width
 				: this.specificWidth[this.viewType]
-			const height = 'height' in this.$options.propsData
-				? this.height
-				: this.specificHeight[this.viewType]
 
-			return {
+			return this.viewType === 'rectangle' ? {
 				minWidth: `${+width}px`,
-				minHeight: `${+height}px`,
-				width: `${+width}px`,
-				height: `${+height}px`
-			}
+				width: `${+width}px`
+			} : null
 		},
 		setClassLabelPosition() {
 			if (this.labelPosition === 'left' && (this.label || this.label.length)) {
@@ -154,6 +202,12 @@ export default {
 			return this.disabled ? `v-checkbox-${this.viewType}--disabled` : null
 		}
 	},
+	created() {
+		this.labelRef = String(Math.random()).slice(2, 10)
+	},
+	mounted() {
+		this.labelHeight = this.$refs[this.labelRef].offsetHeight
+	}
 }
 </script>
 
@@ -162,7 +216,6 @@ export default {
 		width: fit-content;
 		position: relative;
 		display: flex;
-		align-items: center;
 
 		&__v-checkbox-hidden {
 			width: 100%;
@@ -188,17 +241,9 @@ export default {
 
 	.v-checkbox-container:hover {
 		.v-checkbox {
-			&-square {
+			&-square, &-circle {
 				&--yes {
-					border: 2px solid #d0d0e2;
-					background-color: #d0d0e2;
-
-					// .v-checkbox-image {
-					// 	animation: in-checkbox .2s ease-out forwards;
-					// 	@keyframes in-checkbox {
-					// 		100% { transform: rotateZ(-10deg) }
-					// 	}
-					// }
+					opacity: .8;
 				}
 				&--no {
 					border: 2px solid #d0d0e2;
@@ -208,11 +253,7 @@ export default {
 
 			&-rectangle {
 				&--yes {
-					.v-checkbox-image {
-						&-rectangle {
-							box-shadow: -1px 2px 2px rgba(233, 230, 230, 1);
-						}
-					}
+					opacity: .8;
 				}
 				&--no {
 					.v-checkbox-image {
@@ -239,19 +280,27 @@ export default {
 	.v-checkbox {
 		order: 1;
 		transition: .1s;
-		
+
 		&-square {
+			border-radius: 6px;
+		}
+
+		&-circle {
+			border-radius: 50%;
+		}
+		
+		&-square, &-circle {
 			display: flex;
 			justify-content: center;
 			align-items: center;
-			border-radius: 6px;
 
 			&--yes {
-				border: 2px solid #1f1f33;
-				background-color: #1f1f33;
+				border: 2px solid var(--b-color);
+				background-color: var(--b-color);
 			}
 			&--no {
 				border: 2px solid #eeedf7;
+				background-color: #fff;
 	
 				.v-checkbox-image {
 					visibility: hidden;
@@ -262,22 +311,19 @@ export default {
 				background: #c6c6d4;
 				opacity: .5;
 			}
-			& > * {
-				width: 20px;
-			}
 		}
 		&-rectangle {
 			border-radius: 24px;
 			position: relative;
 
 			&--yes {
-				background-color: #1f1f33;
-				border: 2px solid #1f1f33;
+				background-color: var(--b-color);
+				border: 2px solid var(--b-color);
 
 				.v-checkbox-image {
 					animation: yes-rectangle-toggle .2s forwards;
 					@keyframes yes-rectangle-toggle {
-						100% { left: calc(100% - 28px) }
+						100% { left: calc(100% - var(--r-size)) }
 					}
 				}
 			}
@@ -288,7 +334,7 @@ export default {
 				.v-checkbox-image {
 					animation: no-rectangle-toggle .2s forwards;
 					@keyframes no-rectangle-toggle {
-						0% { left: calc(100% - 28px) }
+						0% { left: calc(100% - var(--r-size)) }
 						100% { left: 0px }
 					}
 				}
@@ -298,17 +344,13 @@ export default {
 				border: 2px solid #c6c6d4;
 				opacity: .5;
 			}
-			& > * {
-				width: 28px;
-				height: 28px;
-			}
 		}
 	}
 
 	.v-checkbox-image {
 		position: relative;
 
-		&-square {
+		&-square, &-circle {
 			animation: out-checkbox .2s ease-out forwards;
 			@keyframes out-checkbox {
 				0% { transform: rotateZ(-10deg) }
@@ -324,20 +366,18 @@ export default {
 			&::before {
 				width: 7px;
 				top: calc(50% + 2px);
-				left: 2px;
+				left: calc(50% - 8px);
 				transform: translateY(-50%) rotate(45deg)
 			}
 			&::after {
 				width: 14px;
 				top: 50%;
-				left: 5px;
+				left: calc(50% - 5px);
 				transform: translateY(-50%) rotate(-45deg)
 			}
 		}
 
 		&-rectangle {
-			width: 28px;
-			height: 28px;
 			border-radius: 50%;
 			background: #fff;
 			left: 0;

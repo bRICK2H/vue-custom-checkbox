@@ -6,12 +6,15 @@
 | v-model 		  | `Boolean`				    | **false** 		  | Переключающееся значение
 | label 				| `[String, Array]`   | **''** 			    | Заголовок для значения (если необходима череда ссылок и текста можно сформировать массив объектов text, link. Если link пуст вернется текст либо вернется ссылка)
 | labelPosition | `String`				    | **'right'** 		| Позиция заголовка right|left
+| checkPosition | `String`				    | **'center'** 		| Позиция заголовка top|start|center|bottom|end
 | disabled 			| `Boolean`	          | **false** 			| Заблокировать переключатель
-| viewType 			| `String`	          | **'square'** 		| Выбрать тип переключателя из ['square', 'rectangle']
+| viewType 			| `String`	          | **'circle'** 		| Выбрать тип переключателя из ['circle', 'square', 'rectangle']
 | width 				| `[String, Number]`	| **24** 			    | Ширина переключателя
 | height 			  | `[String, Number]`	| **24** 			    | Высота переключателя
 | margin 			  | `[String, Number]`	| **'0 0 25 8'** 	| Внешнее смещение
 | classes 			| `Array`				      | **[]** 			    | Массив классов
+| elClass 			| `String`				    | **''** 			    | Пробрасывается класс на элемент чекбокса
+| bColor 			  | `String`				    | **#1f1f33** 		| Цвет заливки чекбокса
 
 ## Example:
 ```html
